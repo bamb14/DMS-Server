@@ -1,5 +1,6 @@
 package com.dms.demo.controller;
 
+import com.dms.demo.dto.UserDto;
 import com.dms.demo.entity.User;
 import com.dms.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,13 @@ public class UserController {
 
     // 1. 생성 (Create)
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public User createUser(@RequestBody UserDto.CreateRequest req) {
+        return userService.createUser(req);
     }
 
     // 4. 삭제 (Delete)
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") Long id) {
+    public void deleteUser(@PathVariable("id)") Long id) {
         userService.deleteUser(id);
     }
 }
