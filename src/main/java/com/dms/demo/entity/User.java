@@ -26,11 +26,9 @@ public class User {
     @Column(nullable = false, length = 100)
     private String name;
 
-    // @Column(name = "dept_id")
-    // private Long deptId;
-
-    @Column(name="dept_name", length = 100)
-    private String deptName;
+    @ManyToOne(fetch = FetchType.LAZY) // 필요할 때만 조회 (성능 최적화)
+    @JoinColumn(name = "dept_id")      // 실제 DB 컬럼명
+    private Department department;
 
     // 생성 시간 자동 기록
     @Column(name = "created_at", nullable = false, updatable = false)
