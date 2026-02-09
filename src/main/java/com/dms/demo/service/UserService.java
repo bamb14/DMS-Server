@@ -7,6 +7,8 @@ import com.dms.demo.repository.DepartmentRepository;
 import com.dms.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -16,6 +18,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+    
     // 1. 생성 (Create)
     @Transactional
     public User createUser(UserDto.CreateRequest req) {
@@ -26,12 +31,14 @@ public class UserService {
             throw new RuntimeException("존재하지 않는 부서입니다: " + req.getDeptName());
         }
 
+        String passwordHash = passwordEncoder.encode(req.getPasswordHash());
+
         // 3. 유저 생성 (부서 정보를 같이 넣어줌)
         User newUser = User.builder()
                 .empNo(req.getEmpNo())
                 .name(req.getName())
-                .passwordHash(req.getPasswordHash())
-                .department(department) // 👈 찾아낸 부서 객체(Entity)를 통째로 넣어줍니다 (JPA 연관관계)
+                .passwordHash(passwordHash)
+                .department(department)
                 .build();
         return userRepository.save(newUser);
     }
