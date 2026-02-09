@@ -43,6 +43,19 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
+    @Transactional
+    public UserDto.LoginResponse login(UserDto.LoginRequest req){
+        User user=userRepository.findByEmpNo(req.empNo())
+                .orElseThrow(() -> new IlleagalArgumentException("유저가 존재하지 않습니다."));
+
+        boolean isMatch = passwordEncoder.matches(req.passwordHash(), user.getPasswordHash());
+
+        if(!isMatch){
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+        return UserDto.LoginResponse.from(user);
+    }
+
     // 4. 삭제 (Delete)
     @Transactional
     public void deleteUser(Long id) {
