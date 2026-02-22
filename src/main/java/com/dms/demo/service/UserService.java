@@ -3,6 +3,8 @@ package com.dms.demo.service;
 import com.dms.demo.dto.UserDto;
 import com.dms.demo.entity.Department;
 import com.dms.demo.entity.User;
+import com.dms.demo.exception.DuplicateResourceException;
+import com.dms.demo.exception.ResourceNotFoundException;
 import com.dms.demo.repository.DepartmentRepository;
 import com.dms.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -16,29 +18,34 @@ public class UserService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
 
-    // 1. 생성 (Create)
+    // 유저 생성
     @Transactional
-    public User createUser(UserDto.CreateRequest req) {
-        // 2. [추가] 부서명으로 부서 조회 (없으면 에러)
-        Department department = departmentRepository.findByDeptName(req.getDeptName());
-
-        if (department == null) {
-            throw new RuntimeException("존재하지 않는 부서입니다: " + req.getDeptName());
+    public User createUser(UserDto.CreateRequest request) {
+        // 1. 사번 중복 체크
+        if (userRepository.existsByEmpNo(request.getEmpNo())) {
+            throw new DuplicateResourceException("이미 존재하는 사번입니다: " + request.getEmpNo());
         }
+        
+        // 2. 부서명으로 부서 조회
+        Department department = departmentRepository.findByDeptName(request.getDept())
+                .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 부서입니다: " + request.getDept()));
 
-        // 3. 유저 생성 (부서 정보를 같이 넣어줌)
+        // 3. 유저 생성
         User newUser = User.builder()
-                .empNo(req.getEmpNo())
-                .name(req.getName())
-                .passwordHash(req.getPasswordHash())
-                .department(department) // 👈 찾아낸 부서 객체(Entity)를 통째로 넣어줍니다 (JPA 연관관계)
+                .empNo(request.getEmpNo())
+                .name(request.getName())
+                .passwordHash(request.getPasswordHash())
+                .department(department)
                 .build();
         return userRepository.save(newUser);
     }
 
-    // 4. 삭제 (Delete)
+    // 로그인
     @Transactional
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    public UserDto.LoginResponse login(UserDto.LoginRequest req) {
+    	User user=userRepository.findByEmpNo(req.empNo())
+    			.orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+    	
+    	return UserDto.LoginResponse.from(user);
     }
 }
