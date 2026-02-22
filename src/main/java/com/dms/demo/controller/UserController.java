@@ -4,6 +4,9 @@ import com.dms.demo.dto.UserDto;
 import com.dms.demo.entity.User;
 import com.dms.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,15 +16,16 @@ public class UserController {
 
     private final UserService userService;
 
-    // 1. 생성 (Create)
+    // POST /api/users
     @PostMapping
-    public User createUser(@RequestBody UserDto.CreateRequest req) {
-        return userService.createUser(req);
+    public User create(@RequestBody UserDto.CreateRequest user) {
+        return userService.createUser(user);
     }
-
-    // 4. 삭제 (Delete)
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id)") Long id) {
-        userService.deleteUser(id);
+    
+    // POST /api/users/logins
+    @PostMapping("/login")
+    public ResponseEntity<UserDto.LoginResponse> login(@RequestBody UserDto.LoginRequest req) {
+    	UserDto.LoginResponse response = userService.login(req);
+    	return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
