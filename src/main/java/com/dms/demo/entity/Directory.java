@@ -2,7 +2,6 @@ package com.dms.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +9,15 @@ import java.util.List;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 
-@Builder
 @Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "directories")
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Directory {
 
-    @Id
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "dir_id")
 	private Long dirId;
