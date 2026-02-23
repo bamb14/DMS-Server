@@ -68,8 +68,8 @@ public class DirectoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("존재하지 않는 폴더입니다."));
         
         // [중복 검사] 생성하기 전에 이름 체크!
-        Long parendId = (directory.getParent() != null) ? directory.getParent().getDirId() : null;
-        checkDuplicateName(parendId, newName);
+        Long parentId = (directory.getParent() != null) ? directory.getParent().getDirId() : null;
+        checkDuplicateName(parentId, newName);
   
         directory.rename(newName);
     }
